@@ -38,7 +38,7 @@ pi1_summary <- pi1_all |>
     group_by(discovery) |> 
     summarise(median_pi1 = median(pi1, na.rm = TRUE),
               max_pi1 = max(pi1, na.rm = TRUE),
-              max_dataset_id = dataset_id[which.max(pi1)]
+              max_dataset_id = dataset_id[which.max(pi1)],
               min_pi1 = min(pi1, na.rm = TRUE))
 
 tissue_labels <- c("r" = "Rectum", "ti" = "Terminal ileum", "blood" = "Blood", "ct" = "Cultured cells") |> 
@@ -98,8 +98,7 @@ pi1_combined %>%
         max = max(pi1), 
         max_celltype = major_cell_type[which.max(pi1)],
         .groups = "drop"
-    ) +
-    theme_bw(x )
+    ) 
 
 ggplot(pi1_combined, aes(x = pi1, fill = major_cell_type)) +
     geom_histogram(bins = 50, color = "black") +
@@ -131,7 +130,14 @@ ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse.png"), width = 12, height = 12)
 
 # Plot this as a boxplot instead
 median_by_comparison <- pi1_combined |>
-    summarise(median_pi1 = median(pi1, na.rm = TRUE), .by = comparison)
+    summarise(median_pi1 = median(pi1, na.rm = TRUE), .by = comparison) 
+
+# Use new annotation 
+new_annotation <- read_tsv("../tenk10k-causal/resources/metadata/cell_map_revised.tsv")
+pi1_combined <- pi1_combined %>% 
+  left_join(new_annotation %>% select(wg2_scpred_prediction, revision_major_cell_type), by = join_by("discovery" == "wg2_scpred_prediction")) %>% 
+  rename(superseded_major_cell_type = major_cell_type, 
+         major_cell_type = revision_major_cell_type)
 
 ggplot(pi1_combined, aes(x = major_cell_type, y = pi1, fill = major_cell_type)) +
     geom_boxplot(outlier.shape = NA, alpha = 0.3, whisker.linewidth = 0.2, box.linewidth = 0.2, median.linewidth = 0.2) +
@@ -145,7 +151,7 @@ ggplot(pi1_combined, aes(x = major_cell_type, y = pi1, fill = major_cell_type)) 
     scale_color_identity(guide = guide_legend(), labels = c("red3" = "Median π1")) +
     theme_classic() +
     theme(
-        legend.position = "right",
+        legend.position = "bottom",
         strip.background = element_blank(),
         strip.clip = "off",
         strip.text.x = element_text(size = 11, face = "bold"),
@@ -162,8 +168,11 @@ ggplot(pi1_combined, aes(x = major_cell_type, y = pi1, fill = major_cell_type)) 
     ylim(c(0, 1))
 
 out.dir <- "figures"
-ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v2.png"), width = 10, height = 6, scaling = 1.2)
+ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v3.png"), width = 10, height = 6, scaling = 1.2, dpi = 600)
+ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v6.png"), width = 10, height = 6, scaling = 1.4, dpi = 600)
 
+ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v4.png"), width = 8, height = 10, scaling = 1.2, dpi = 600)
+ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v5.png"), width = 8, height = 10, scaling = 1.4, dpi = 600)
 library(ggbeeswarm)
 
 ggplot(pi1_combined, aes(x = major_cell_type, y = pi1, fill = comparison, color = comparison)) +
