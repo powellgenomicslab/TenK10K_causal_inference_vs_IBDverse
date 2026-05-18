@@ -138,16 +138,28 @@ pi1_combined <- pi1_combined %>%
   left_join(new_annotation %>% select(wg2_scpred_prediction, revision_major_cell_type), by = join_by("discovery" == "wg2_scpred_prediction")) %>% 
   rename(superseded_major_cell_type = major_cell_type, 
          major_cell_type = revision_major_cell_type)
-
+# Match cell type colours to mr_deg plot 
+darker_colors <- c(
+  "B" = "#ba8e23", 
+  "CD4 T" = "#674FA3", 
+  "CD8 T" = "#1976D2", 
+  "Dendritic" = "#65350F", 
+  "Monocyte" = "#D84315", 
+  "NK" = "#1B5E20", 
+  "Plasma B" = "#FBC02D", 
+  "Unconventional T" = "#4A001F",
+  "HSPC" = "#E75480"
+)
 ggplot(pi1_combined, aes(x = major_cell_type, y = pi1, fill = major_cell_type)) +
-    geom_boxplot(outlier.shape = NA, alpha = 0.3, whisker.linewidth = 0.2, box.linewidth = 0.2, median.linewidth = 0.2) +
+    geom_boxplot(outlier.shape = NA, alpha = 0.5, whisker.linewidth = 0.2, box.linewidth = 0.2, median.linewidth = 0.2) +
     geom_point(aes(fill = major_cell_type), shape = "circle filled", position = position_dodge(width = 0.5), size = 1, alpha = 0.7) +
     geom_hline(
         data = median_by_comparison,
         aes(yintercept = median_pi1, color = "red3"),
         lty = "dashed", linewidth = 0.5
     ) +
-  scale_fill_paletteer_d("ggsci::category10_d3", name = NULL) +
+  #scale_fill_paletteer_d("ggsci::category10_d3", name = NULL) +
+  scale_fill_manual(values = darker_colors, name = NULL) +
     scale_color_identity(guide = guide_legend(), labels = c("red3" = "Median π1")) +
     theme_classic() +
     theme(
@@ -168,11 +180,23 @@ ggplot(pi1_combined, aes(x = major_cell_type, y = pi1, fill = major_cell_type)) 
     ylim(c(0, 1))
 
 out.dir <- "figures"
-ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v3.png"), width = 10, height = 6, scaling = 1.2, dpi = 600)
-ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v6.png"), width = 10, height = 6, scaling = 1.4, dpi = 600)
+# ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v3.png"), width = 10, height = 6, scaling = 1.2, dpi = 500)
+# ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v3.pdf"), width = 10, height = 6, dpi = 500)
+ggsave("../tenk10k-causal/resources/crohns_case_study/figures/pi1_TenK10K_vs_IBDverse_boxplot_v3_darker_colours.png", width = 10, height = 6, scaling = 1.2, dpi = 500)
+ggsave("../tenk10k-causal/resources/crohns_case_study/figures/pi1_TenK10K_vs_IBDverse_boxplot_v3_darker_colours.svg", width = 10, height = 6, scaling = 1.2, dpi = 500)
+ggsave("../tenk10k-causal/resources/crohns_case_study/figures/pi1_TenK10K_vs_IBDverse_boxplot_v3_darker_colours_alpha0.5.pdf", width = 8, height = 6, dpi = 500)
 
-ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v4.png"), width = 8, height = 10, scaling = 1.2, dpi = 600)
-ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v5.png"), width = 8, height = 10, scaling = 1.4, dpi = 600)
+# ggsave("../tenk10k-causal/resources/crohns_case_study/figures/pdfs/pi1_TenK10K_vs_IBDverse_boxplot_v3.pdf", width = 8, height = 6, dpi = 500)
+
+# Export at small size 
+ggsave("../tenk10k-causal/resources/crohns_case_study/figures/pdfs/pi1_TenK10K_vs_IBDverse_boxplot.png", width = 3.5, height = 2, units = "in", dpi = 500)
+ggsave("../tenk10k-causal/resources/crohns_case_study/figures/pdfs/pi1_TenK10K_vs_IBDverse_boxplot.pdf", width = 3.5, height = 2, units = "in", dpi = 500)
+ggsave("../tenk10k-causal/resources/crohns_case_study/figures/pdfs/pi1_TenK10K_vs_IBDverse_boxplot.svg", width = 3.5, height = 2, units = "in", dpi = 500)
+
+#ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v6.png"), width = 10, height = 6, scaling = 1.4, dpi = 600)
+
+# ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v4.png"), width = 8, height = 10, scaling = 1.2, dpi = 600)
+# ggsave(paste0(out.dir, "/pi1_TenK10K_vs_IBDverse_boxplot_v5.png"), width = 8, height = 10, scaling = 1.4, dpi = 600)
 library(ggbeeswarm)
 
 ggplot(pi1_combined, aes(x = major_cell_type, y = pi1, fill = comparison, color = comparison)) +

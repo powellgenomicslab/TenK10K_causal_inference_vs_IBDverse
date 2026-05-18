@@ -65,7 +65,7 @@ lm_fit <- lm(log(OR) ~ log10(prop_blood), data = tenk_not_novel_rel_res)
 slope <- signif(coef(lm_fit)[[2]], 3)
 pval <- signif(summary(lm_fit)$coefficients["log10(prop_blood)", "Pr(>|t|)"], 3)
 print(paste0("Slope: ", slope, ". p=", pval))
-
+min_x <- -5
 # ybreaks_or = c(1, 1.5, 2, 3, 4, 6)
 # ybreaks_log_or = log(ybreaks_or)
 tenk_not_novel_rel_res$annotation_type = "Major population"
@@ -101,7 +101,9 @@ ggplot(tenk_not_novel_rel_res, aes(x = log10(prop_blood), y = log(OR))) +
   annotate("label", x = -Inf, y = Inf, label = paste0("β = ", slope, ", p = ", pval), hjust = -0.2, vjust = 1.2) +
   theme(legend.position = "none")
 
-ggsave(paste0(out.dir, "/Blood_proportion_vs_OR_effector_genes_relative.png"), device = ragg::agg_png, scaling = 1, width = 5.5, height = 5)
+ggsave(paste0(out.dir, "/Blood_proportion_vs_OR_effector_genes_relative.png"), device = ragg::agg_png, scaling = 1, width = 5.5, height = 5, dpi = 500)
+ggsave(paste0(out.dir, "/Blood_proportion_vs_OR_effector_genes_relative.pdf"), width = 5.5, height = 5, dpi = 500)
+ggsave("../tenk10k-causal/resources/crohns_case_study/figures/pdfs/Blood_proportion_vs_OR_effector_genes_relative.pdf", width = 5.5, height = 5, dpi = 500)
 
 # cell-type level results
 
