@@ -70,6 +70,8 @@ min_x <- -5
 # ybreaks_log_or = log(ybreaks_or)
 tenk_not_novel_rel_res$annotation_type = "Major population"
 
+tenk_not_novel_rel_res <- tenk_not_novel_rel_res %>% mutate(blood_derived = category %in% c("B", "Plasma", "Myeloid", "T"), TRUE)
+
 ggplot(tenk_not_novel_rel_res, aes(x = log10(prop_blood), y = log(OR))) +
   annotate("rect", xmin = -Inf, xmax = -2, ymin = -Inf, ymax = Inf,
            fill = "#4DAF4A", alpha = 0.2) +
@@ -81,12 +83,13 @@ ggplot(tenk_not_novel_rel_res, aes(x = log10(prop_blood), y = log(OR))) +
            hjust = 1.1, vjust = -0.5, color = "#377EB8", size = 3.5, fontface = "plain") +
   geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed", linewidth = 0.5) +
   # geom_errorbar(aes(ymin = log(CI_low), ymax = log(CI_high), color = category), width = 0.05, linewidth = 0.4) +
-  geom_point(aes(fill = category), size = 4, shape = 21, stroke = 0.7) +
-  geom_label_repel(aes(label = category), size = 9/.pt, force = 5, min.segment.length = 0,
+  geom_point(aes(fill = blood_derived), size = 4, shape = 21, stroke = 0.7) +
+  scale_fill_manual(values = c("TRUE" = "#B03060", "FALSE" = "darkblue")) +
+  geom_label_repel(aes(label = category), size = 9/.pt, force = 5, min.segment.length = 0, border.colour = NA,
     label.size = 0, max.overlaps = Inf, label.padding = 0.1, point.padding = unit(5, "lines"), fill = alpha("white", .8)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "lightgrey", linewidth = 0.5) +
-  scale_fill_paletteer_d("ggsci::category10_d3", name = NULL) +
-  scale_color_paletteer_d("ggsci::category10_d3", name = NULL, guide = "none") +
+  # scale_fill_paletteer_d("ggsci::category10_d3", name = NULL) +
+  # scale_color_paletteer_d("ggsci::category10_d3", name = NULL, guide = "none") +
   labs(
     x = "Fraction of cells derived from blood samples in IBDverse",
     y = "Odds ratio for IBDverse-nominated \neffector gene already found in TenK10K"
@@ -103,7 +106,7 @@ ggplot(tenk_not_novel_rel_res, aes(x = log10(prop_blood), y = log(OR))) +
 
 ggsave(paste0(out.dir, "/Blood_proportion_vs_OR_effector_genes_relative.png"), device = ragg::agg_png, scaling = 1, width = 5.5, height = 5, dpi = 500)
 ggsave(paste0(out.dir, "/Blood_proportion_vs_OR_effector_genes_relative.pdf"), width = 5.5, height = 5, dpi = 500)
-ggsave("../tenk10k-causal/resources/crohns_case_study/figures/pdfs/Blood_proportion_vs_OR_effector_genes_relative.pdf", width = 5.5, height = 5, dpi = 500)
+ggsave("../tenk10k-causal/resources/crohns_case_study/figures/pdfs/Blood_proportion_vs_OR_effector_genes_relative.pdf", width = 5.5, height = 5, units = "mm", dpi = 500)
 
 # cell-type level results
 
